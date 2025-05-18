@@ -90,7 +90,7 @@ import { firstValueFrom } from 'rxjs';
         </thead>
         <tbody class="divide-y divide-gray-200">
           @for(test of tests();track test){
-          <tr class="hover:bg-gray-100" [routerLink]="['tests-1']">
+          <tr class="hover:bg-gray-100" [routerLink]="[test.id]">
             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
               {{ test.name }}
             </td>
@@ -107,7 +107,7 @@ import { firstValueFrom } from 'rxjs';
               </span>
             </td>
             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-700">
-              {{ test.name }}
+              {{ test.testrunner }}
             </td>
             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
               {{ test.lastPing }}

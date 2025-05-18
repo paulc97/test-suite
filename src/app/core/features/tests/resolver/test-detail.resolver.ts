@@ -1,4 +1,4 @@
-import { Resolve } from '@angular/router';
+import { ActivatedRouteSnapshot, Resolve } from '@angular/router';
 import { testDetails, TestDetailSerivce } from '../services/details.service';
 import { inject, Injectable } from '@angular/core';
 
@@ -6,7 +6,9 @@ import { inject, Injectable } from '@angular/core';
 export class TestDetailResolver implements Resolve<testDetails> {
   private testDetailService = inject(TestDetailSerivce);
 
-  resolve() {
-    return this.testDetailService.getTestDetails();
+  resolve(route:ActivatedRouteSnapshot) {
+    const id = route.paramMap.get("id") || ""
+    return this.testDetailService.getTestDetails(Number(id));
   }
+  
 }

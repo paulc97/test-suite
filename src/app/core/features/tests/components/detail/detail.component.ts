@@ -8,10 +8,10 @@ import { testDetails } from '../../services/details.service';
     <div class="mx-auto max-w-7xl py-4 sm:px-6 lg:px-8">
       <div class="px-4 sm:px-0">
         <h3 class="text-base/7 font-semibold text-gray-900">
-          {{ testDetails().name }}
+          {{ testDetailData().name }}
         </h3>
         <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">
-          Informationen zu Test {{ testDetails().name }}
+          Informationen zu Test {{ testDetailData().name }}
         </p>
       </div>
       <div>
@@ -25,7 +25,7 @@ import { testDetails } from '../../services/details.service';
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight text-green-500"
             >
-              {{ testDetails().status }}
+              {{ testDetailData().status }}
             </dd>
           </div>
           <div
@@ -49,7 +49,7 @@ import { testDetails } from '../../services/details.service';
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"
             >
-              {{ testDetails().lastPing }}
+              {{ testDetailData().lastPing }}
             </dd>
           </div>
         </dl>
@@ -59,25 +59,25 @@ import { testDetails } from '../../services/details.service';
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Name</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ testDetails().name }}
+              {{ testDetailData().name }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Testrunner</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ testDetails().testrunner }}
+              {{ testDetailData().testrunner }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Startzeit</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ testDetails().startTime }}
+              {{ testDetailData().startTime }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Ausführungszeit</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ testDetails().elapsedSeconds }}
+              {{ testDetailData().elapsedSeconds }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -85,13 +85,13 @@ import { testDetails } from '../../services/details.service';
               Testbeschreibung
             </dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ testDetails().description }}
+              {{ testDetailData().description }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Bericht</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ testDetails().report }}
+              {{ testDetailData().report }}
             </dd>
           </div>
           <!-- <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -167,5 +167,5 @@ import { testDetails } from '../../services/details.service';
   styles: ``,
 })
 export class DetailComponent {
-  testDetails = input.required<testDetails>();
+  testDetailData = input.required<testDetails>();
 }

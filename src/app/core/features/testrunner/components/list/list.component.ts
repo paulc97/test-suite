@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import {
@@ -17,6 +17,10 @@ import {
   faRabbitRunning,
   faFaceSleeping,
 } from '@fortawesome/pro-solid-svg-icons';
+import { testrunnerListElement } from '../../services/list.service';
+import { firstValueFrom } from 'rxjs';
+import { ConfirmComponent } from '../../../shared/components/confirm/confirm.component';
+import { Dialog } from '@angular/cdk/dialog';
 
 @Component({
   selector: 'app-list',
@@ -66,25 +70,27 @@ import {
             </tr>
           </thead>
           <tbody class="divide-y divide-gray-200">
-            @for(runner of [1, 2, 3];track runner){
-            <tr class="hover:bg-gray-100" [routerLink]="['runner-1']">
+            @for(testrunner of testrunners();track testrunner){
+            <tr class="hover:bg-gray-100" [routerLink]="[testrunner.id]">
               <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
-                runner-{{ runner }}
+                {{ testrunner.name }}
               </td>
               <td class="whitespace-nowrap px-3 py-4 text-sm">
                 <span class="inline-flex items-center gap-2 text-green-600">
                   <fa-icon [icon]="icons.faFaceSleeping" class="text-xs" />
-                  Schlafend
+                  {{ testrunner.status }}
                 </span>
               </td>
               <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-700">
-                Testrunner-as123
+                {{ testrunner.cpu }}
               </td>
               <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                vor {{ runner + 5 + runner * 2 }} Sekunden
+                {{ testrunner.lastPing }}
               </td>
               <td class="whitespace-nowrap px-3 py-4 text-sm flex gap-2">
-                <button class="text-red-600 hover:text-red-800">
+                <button class="text-red-600 hover:text-red-800"
+                (click)="onHeartbeatClicked($event)"
+                >
                   <fa-icon [icon]="icons.heartBeat" size="lg"></fa-icon>
                 </button>
               </td>
@@ -98,6 +104,28 @@ import {
   styles: ``,
 })
 export class ListComponent {
+
+   testrunners = input<testrunnerListElement[]>();
+
+   private dialog = inject(Dialog);
+
+  async onHeartbeatClicked($event: Event) {
+    $event.stopPropagation();
+    const result = await this.openConfirmDialog(
+      'Wirklich Heartbeat Anfordern?'
+    );
+    console.log('Dialog closed', result);
+  }
+
+      private async openConfirmDialog(confirmText: string): Promise<any> {
+        const dialogRef = this.dialog.open(ConfirmComponent, {
+          data: { confirmText },
+          width: '400px',
+        });
+    
+        return await firstValueFrom(dialogRef.closed);
+      }
+
   icons = {
     male: faMars,
     female: faVenus,

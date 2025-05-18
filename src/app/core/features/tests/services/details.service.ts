@@ -2,10 +2,10 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class TestDetailSerivce {
-  getTestDetails() {
+  getTestDetails(id: number) {
     return {
-      id: 1,
-      name: 'test-1',
+      id: id,
+      name: 'test-'+id,
       status: 'running',
       testrunner: 'testrunner-as123',
       lastPing: 'vor 5 Sekunden',

@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import { Component, input } from '@angular/core';
+import { testrunnerDetails } from '../../services/details.service';
 
 @Component({
   selector: 'app-detail',
@@ -6,7 +7,7 @@ import { Component } from '@angular/core';
   template: `
     <div class="mx-auto max-w-7xl py-4 sm:px-6 lg:px-8">
       <div class="px-4 sm:px-0">
-        <h3 class="text-base/7 font-semibold text-gray-900">Testrunner-1</h3>
+        <h3 class="text-base/7 font-semibold text-gray-900">Testrunner-{{ testrunnerDetailData().id}}</h3>
         <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">
           Informationen zu Test XY
         </p>
@@ -22,7 +23,7 @@ import { Component } from '@angular/core';
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight text-green-500"
             >
-              Warten...
+              {{ testrunnerDetailData().status }}
             </dd>
           </div>
           <div
@@ -34,7 +35,7 @@ import { Component } from '@angular/core';
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"
             >
-              Setting up volumes
+              Setting up volumes TODO
             </dd>
           </div>
           <div
@@ -46,7 +47,7 @@ import { Component } from '@angular/core';
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"
             >
-              12 Sekunden
+              {{ testrunnerDetailData().lastPing }}
             </dd>
           </div>
         </dl>
@@ -56,13 +57,13 @@ import { Component } from '@angular/core';
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Name</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              Runner-123
+              {{ testrunnerDetailData().name }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt class="text-sm/6 font-medium text-gray-900">System</dt>
+            <dt class="text-sm/6 font-medium text-gray-900">Test</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              Linux Arm64
+              {{ testrunnerDetailData().activeTest }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -70,7 +71,7 @@ import { Component } from '@angular/core';
               Registrierungszeit
             </dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              12.05.2025 14:38
+              {{ testrunnerDetailData().startTime }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -78,13 +79,13 @@ import { Component } from '@angular/core';
               Max Ausführungsdauer
             </dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              1762 Sekunden
+              {{ testrunnerDetailData().uptimeSeconds }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Specs</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              128 GB RAM, 8 CPU, 1 TB SSD
+              128 GB RAM, 8 CPU, 1 TB SSD TODO plattform
             </dd>
           </div>
           <!-- <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -159,4 +160,6 @@ import { Component } from '@angular/core';
   `,
   styles: ``,
 })
-export class DetailComponent {}
+export class DetailComponent {
+  testrunnerDetailData = input.required<testrunnerDetails>();
+}
