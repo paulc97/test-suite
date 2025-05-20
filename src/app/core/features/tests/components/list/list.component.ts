@@ -16,6 +16,7 @@ import {
   faWavePulse,
   faTrash,
   faRabbitRunning,
+  faXmark,
 } from '@fortawesome/pro-solid-svg-icons';
 import { RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
@@ -35,9 +36,9 @@ import { firstValueFrom } from 'rxjs';
 
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold text-gray-900">Tests (3)</h1>
+        <h1 class="text-base font-semibold text-gray-900">Tests (4)</h1>
         <p class="mt-2 text-sm text-gray-700">
-          Übersicht aller verganenden Tests.
+          Übersicht aller Tests.
         </p>
       </div>
       <div class="mt-4 sm:mt-0 sm:flex-none flex items-center gap-2">
@@ -74,7 +75,7 @@ import { firstValueFrom } from 'rxjs';
             <th
               class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
             >
-              Letzter Ping
+              Letztes Update
             </th>
             <th
               class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
@@ -132,7 +133,7 @@ import { firstValueFrom } from 'rxjs';
                 class="text-red-600 hover:text-red-800"
                 (click)="onDeleteClicked($event)"
               >
-                <fa-icon [icon]="icons.trash" size="lg"></fa-icon>
+                <fa-icon [icon]="icons.xMark" size="lg"></fa-icon>
               </button>
             </td>
           </tr>
@@ -151,7 +152,7 @@ export class ListComponent {
   async onHeartbeatClicked($event: Event) {
     $event.stopPropagation();
     const result = await this.openConfirmDialog(
-      'Wirklich Heartbeat Anfordern?'
+      'Wirklich Statusupdate Anfordern?'
     );
     console.log('Dialog closed', result);
   }
@@ -182,7 +183,7 @@ export class ListComponent {
       case 'passed':
         return this.icons.trash;
       case 'failed':
-        return this.icons.trash;
+        return this.icons.xMark;
       case 'skipped':
         return this.icons.trash;
       case 'pending':
@@ -207,5 +208,6 @@ export class ListComponent {
     arrowsRotate: faArrowsRotate,
     heartBeat: faWavePulse,
     rabbitRunning: faRabbitRunning,
+    xMark: faXmark,
   };
 }

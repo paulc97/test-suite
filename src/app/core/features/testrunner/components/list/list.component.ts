@@ -30,9 +30,9 @@ import { Dialog } from '@angular/cdk/dialog';
       <!-- Header -->
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-          <h1 class="text-base font-semibold text-gray-900">Testrunner (5)</h1>
+          <h1 class="text-base font-semibold text-gray-900">Testrunner (3)</h1>
           <p class="mt-2 text-sm text-gray-700">
-            Übersicht aller verganenden Tests.
+            Übersicht aller Testrunner.
           </p>
         </div>
       </div>
@@ -45,7 +45,7 @@ import { Dialog } from '@angular/cdk/dialog';
               <th
                 class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
               >
-                Name
+                ID
               </th>
               <th
                 class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
@@ -55,12 +55,12 @@ import { Dialog } from '@angular/cdk/dialog';
               <th
                 class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
               >
-                CPU
+                Plattform
               </th>
               <th
                 class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
               >
-                Letzter Ping
+                Letzter Heartbeat
               </th>
               <th
                 class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"

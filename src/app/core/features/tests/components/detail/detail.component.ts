@@ -32,12 +32,12 @@ import { testDetails } from '../../services/details.service';
             class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6"
           >
             <dt class="truncate text-sm font-medium text-gray-500">
-              Letztes Feedback
+              TODO
             </dt>
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"
             >
-              10-as-Test TODO
+              TODO
             </dd>
           </div>
           <div
@@ -92,6 +92,18 @@ import { testDetails } from '../../services/details.service';
             <dt class="text-sm/6 font-medium text-gray-900">Bericht</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
               {{ testDetailData().report }}
+            </dd>
+          </div>
+          <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt class="text-sm/6 font-medium text-gray-900">Error</dt>
+            <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+              --
+            </dd>
+          </div>
+          <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
+            <dt class="text-sm/6 font-medium text-gray-900">Errormessage</dt>
+            <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
+              --
             </dd>
           </div>
           <!-- <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">

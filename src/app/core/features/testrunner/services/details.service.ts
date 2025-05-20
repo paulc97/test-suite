@@ -10,7 +10,7 @@ export class TestrunnerDetailSerivce {
       lastPing: 'vor 5 Sekunden',
       startTime: new Date(),
       uptimeSeconds: 300,
-      activeTest: "laufendertest"
+      activeTest: "laufendertest-123"
     };
   }
 }

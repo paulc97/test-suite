@@ -8,22 +8,22 @@ export class TestrunnerListSerivce {
         id: 1,
         name: 'testrunner-1',
         status: 'sleeping',
-        cpu: '123',
+        cpu: 'Vagrant',
         lastPing: 'vor 5 Sekunden',
       },
             {
         id: 2,
         name: 'testrunner-2',
         status: 'sleeping',
-        cpu: '2cpu',
-        lastPing: 'vor 5 Sekunden',
+        cpu: 'k8s',
+        lastPing: 'vor 10 Sekunden',
       },
             {
         id: 3,
         name: 'testrunner-3',
         status: 'sleeping',
-        cpu: '3cpu',
-        lastPing: 'vor 5 Sekunden',
+        cpu: 'Docker',
+        lastPing: 'vor 20 Sekunden',
       },
     ];
   }
