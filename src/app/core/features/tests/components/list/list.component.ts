@@ -17,6 +17,7 @@ import {
   faTrash,
   faRabbitRunning,
   faXmark,
+  faCircleCheck,
 } from '@fortawesome/pro-solid-svg-icons';
 import { RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
@@ -85,7 +86,7 @@ import { firstValueFrom } from 'rxjs';
             <th
               class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
             >
-              Aktion
+              Aktionen
             </th>
           </tr>
         </thead>
@@ -99,8 +100,8 @@ import { firstValueFrom } from 'rxjs';
               <span
                 class="inline-flex items-center gap-2"
                 [ngClass]="{
-                  ' text-green-600 ': test.status === 'running',
-                  ' text-red-600 ': test.status !== 'running'
+                  ' text-red-600 ': test.status === 'failed',
+                  ' text-green-600 ': test.status !== 'failed'
                 }"
               >
                 <fa-icon [icon]="getStatusIcon(test.status)" class="text-xs" />
@@ -118,19 +119,19 @@ import { firstValueFrom } from 'rxjs';
             </td>
             <td class="whitespace-nowrap px-3 py-4 text-sm flex gap-2">
               <button
-                class="text-red-600 hover:text-red-800"
+                class="text-orange-600 hover:text-orange-800"
                 (click)="onHeartbeatClicked($event)"
               >
                 <fa-icon [icon]="icons.heartBeat" size="lg"></fa-icon>
               </button>
               <button
-                class="text-red-600 hover:text-red-800"
+                class="text-orange-600 hover:text-orange-800"
                 (click)="onRefreshClicked($event)"
               >
                 <fa-icon [icon]="icons.arrowsRotate" size="lg"></fa-icon>
               </button>
               <button
-                class="text-red-600 hover:text-red-800"
+                class="text-orange-600 hover:text-orange-800"
                 (click)="onDeleteClicked($event)"
               >
                 <fa-icon [icon]="icons.xMark" size="lg"></fa-icon>
@@ -151,10 +152,7 @@ export class ListComponent {
 
   async onHeartbeatClicked($event: Event) {
     $event.stopPropagation();
-    const result = await this.openConfirmDialog(
-      'Wirklich Statusupdate Anfordern?'
-    );
-    console.log('Dialog closed', result);
+    
   }
 
   private async openConfirmDialog(confirmText: string): Promise<any> {
@@ -190,8 +188,10 @@ export class ListComponent {
         return this.icons.trash;
       case 'unreachable':
         return this.icons.trash;
+      case 'completed':
+        return this.icons.circlecCheck;  
       default:
-        return this.icons.heartBeat;
+        return this.icons.trash;
     }
   }
 
@@ -209,5 +209,6 @@ export class ListComponent {
     heartBeat: faWavePulse,
     rabbitRunning: faRabbitRunning,
     xMark: faXmark,
+    circlecCheck: faCircleCheck,
   };
 }

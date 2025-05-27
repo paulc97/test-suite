@@ -1,15 +1,18 @@
 import { Component, input } from '@angular/core';
 import { testrunnerDetails } from '../../services/details.service';
+import { formatSeconds } from '../../../shared/services/time.service';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-detail',
-  imports: [],
+  imports: [NgClass],
   template: `
     <div class="mx-auto max-w-7xl py-4 sm:px-6 lg:px-8">
       <div class="px-4 sm:px-0">
         <h3 class="text-base/7 font-semibold text-gray-900">Testrunner-{{ testrunnerDetailData().id}}</h3>
         <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">
-          Informationen zu Test XY
+          Informationen zu {{ testrunnerDetailData().name.charAt(0).toUpperCase() + testrunnerDetailData().name.slice(1) }}
+
         </p>
       </div>
       <div>
@@ -21,23 +24,16 @@ import { testrunnerDetails } from '../../services/details.service';
               Runner Status
             </dt>
             <dd
-              class="mt-1 text-3xl font-semibold tracking-tight text-green-500"
+              class="mt-1 text-3xl font-semibold tracking-tight"
+              [ngClass]="{
+                  ' text-yellow-600 ': testrunnerDetailData().status === 'sleeping',
+                  ' text-green-600 ': testrunnerDetailData().status !== 'sleeping'
+                }" 
             >
               {{ testrunnerDetailData().status }}
             </dd>
           </div>
-          <div
-            class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6"
-          >
-            <dt class="truncate text-sm font-medium text-gray-500">
-              TODO
-            </dt>
-            <dd
-              class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"
-            >
-              TODO
-            </dd>
-          </div>
+
           <div
             class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6"
           >
@@ -79,13 +75,13 @@ import { testrunnerDetails } from '../../services/details.service';
               Laufzeit
             </dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ testrunnerDetailData().uptimeSeconds }}
+              {{ formatSeconds(testrunnerDetailData().uptimeSeconds) }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Plattform</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              Vagrant
+              {{ testrunnerDetailData().plattform }}
             </dd>
           </div>
           <!-- <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -162,4 +158,6 @@ import { testrunnerDetails } from '../../services/details.service';
 })
 export class DetailComponent {
   testrunnerDetailData = input.required<testrunnerDetails>();
+
+  formatSeconds = formatSeconds
 }

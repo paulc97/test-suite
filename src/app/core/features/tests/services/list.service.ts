@@ -25,16 +25,16 @@ export class TestListSerivce {
         name: 'test-3',
         status: 'failed',
         testrunner: 'testrunner-768',
-        lastPing: 'vor 55 Sekunden',
+        lastPing: 'vor 42 Sekunden',
         progress: 0.2,
       },
             {
         id: 4,
         name: 'test-4',
-        status: 'failed',
-        testrunner: 'testrunner-101',
-        lastPing: 'vor 50 Sekunden',
-        progress: 0.6,
+        status: 'completed',
+        testrunner: 'testrunner-123',
+        lastPing: 'vor 55 Sekunden',
+        progress: 1,
       },
     ];
   }

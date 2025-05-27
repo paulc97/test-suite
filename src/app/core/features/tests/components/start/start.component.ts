@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { Location } from '@angular/common';
 
 @Component({
   selector: 'app-start',
@@ -10,7 +11,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
       <div class="px-4 sm:px-0">
         <h3 class="text-base/7 font-semibold text-gray-900">Test Starten</h3>
         <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">
-          Starten Sie einen neuen Test mit dem Testrunner.
+          Starten Sie einen neuen Test mit einem Testrunner.
         </p>
       </div>
       <div class="mt-6 border-t border-gray-100">
@@ -28,6 +29,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
                 [searchable]="true"
                 [closeOnSelect]="true"
                 notFoundText="Keine Einträge gefunden"
+                [clearable]="false"
               ></ng-select>
             </dd>
           </div>
@@ -37,47 +39,74 @@ import { NgSelectModule } from '@ng-select/ng-select';
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
               <ng-select
                 formControlName="testRunnersForm"
-                [items]="testrunners"
+                [items]="forms.controls.testDefinitionForm.value === 1? testrunners : testrunners2"
                 bindLabel="name"
                 bindValue="id"
                 placeholder="Bitte auswählen"
-                [multiple]="true"
+                [multiple]="false"
                 [searchable]="true"
-                [closeOnSelect]="false"
+                [closeOnSelect]="true"
                 notFoundText="Keine Einträge gefunden"
+                [clearable]="false"
               ></ng-select>
             </dd>
           </div>
 
-          <button (click)="logForms()">LOG</button>
+
         </dl>
+        <div class="flex w-full justify-end gap-2">
+          <button
+          id="new-client-button"
+          class="cursor-pointer block rounded-md bg-mhd px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-mhd/80"
+          (click)="onBackButtonClicked()"
+          >
+          Abbrechen
+        </button>
+          <button
+          id="new-client-button"
+          class="cursor-pointer block rounded-md bg-mhd px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-mhd/80"
+          
+          >
+          Test starten
+        </button>
+      </div>
+
       </div>
     </form>
   `,
   styles: ``,
 })
 export class StartComponent implements OnInit {
+
+  private readonly location = inject(Location)
+
+
   forms = new FormGroup({
     testDefinitionForm: new FormControl(null),
-    testRunnersForm: new FormControl(1, { nonNullable: true }),
+    testRunnersForm: new FormControl(null),
   });
 
   ngOnInit(): void {
+    this.forms.controls.testRunnersForm.disable()
+
     this.forms.controls.testDefinitionForm.valueChanges.subscribe((value) => {
-      console.log(value);
-
       if (value) {
-        this.forms.controls['testRunnersForm'].enable();
+        this.forms.controls.testRunnersForm.enable()
+        this.forms.controls.testRunnersForm.reset()
       } else {
-        this.forms.controls['testRunnersForm'].disable();
+        this.forms.controls.testRunnersForm.disable()
+        this.forms.controls.testRunnersForm.reset()
       }
-    });
+    })
 
-    this.forms.controls['testRunnersForm'].disable();
+  }
+
+  onBackButtonClicked() {
+    this.location.back()
   }
 
   logForms() {
-    console.log(this.forms);
+    console.log(this.forms.controls.testDefinitionForm.value === 1?this.testrunners : this.testrunners2);
   }
 
   testDefinitions = [
@@ -86,9 +115,15 @@ export class StartComponent implements OnInit {
     { id: 3, name: 'Test 3' },
   ];
 
+
   testrunners = [
-    { id: 1, name: 'Testrunner 1' },
-    { id: 2, name: 'Testrunner 2' },
-    { id: 3, name: 'Testrunner 3' },
+    { id: 1, name: 'Testrunner A' },
+    { id: 2, name: 'Testrunner B' },
+    { id: 3, name: 'Testrunner C' },
+  ];
+
+  testrunners2 = [
+    { id: 4, name: 'Testrunner D' },
+    { id: 5, name: 'Testrunner E' },
   ];
 }

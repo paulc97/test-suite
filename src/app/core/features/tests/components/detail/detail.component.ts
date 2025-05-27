@@ -1,9 +1,11 @@
 import { Component, input } from '@angular/core';
 import { testDetails } from '../../services/details.service';
+import { formatSeconds } from '../../../shared/services/time.service';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-detail',
-  imports: [],
+  imports: [NgClass],
   template: `
     <div class="mx-auto max-w-7xl py-4 sm:px-6 lg:px-8">
       <div class="px-4 sm:px-0">
@@ -23,7 +25,11 @@ import { testDetails } from '../../services/details.service';
               Test Status
             </dt>
             <dd
-              class="mt-1 text-3xl font-semibold tracking-tight text-green-500"
+              class="mt-1 text-3xl font-semibold tracking-tight"
+                [ngClass]="{
+                  ' text-red-600 ': testDetailData().status === 'failed',
+                  ' text-green-600 ': testDetailData().status !== 'failed'
+                }" 
             >
               {{ testDetailData().status }}
             </dd>
@@ -32,12 +38,12 @@ import { testDetails } from '../../services/details.service';
             class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6"
           >
             <dt class="truncate text-sm font-medium text-gray-500">
-              TODO
+              Progress
             </dt>
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"
             >
-              TODO
+              {{ (testDetailData().progress)*100 + " %" }}
             </dd>
           </div>
           <div
@@ -77,7 +83,7 @@ import { testDetails } from '../../services/details.service';
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Ausführungszeit</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ testDetailData().elapsedSeconds }}
+              {{ formatSeconds(testDetailData().elapsedSeconds) }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -97,13 +103,13 @@ import { testDetails } from '../../services/details.service';
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Error</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              --
+              {{ testDetailData().errorCode }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Errormessage</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              --
+              {{ testDetailData().errorText }}
             </dd>
           </div>
           <!-- <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -180,4 +186,7 @@ import { testDetails } from '../../services/details.service';
 })
 export class DetailComponent {
   testDetailData = input.required<testDetails>();
+
+  formatSeconds = formatSeconds
+
 }

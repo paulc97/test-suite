@@ -1,6 +1,6 @@
 import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { FontAwesomeModule,IconDefinition} from '@fortawesome/angular-fontawesome';
 import {
   faArrowLeft,
   faArrowRight,
@@ -21,10 +21,11 @@ import { testrunnerListElement } from '../../services/list.service';
 import { firstValueFrom } from 'rxjs';
 import { ConfirmComponent } from '../../../shared/components/confirm/confirm.component';
 import { Dialog } from '@angular/cdk/dialog';
+import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-list',
-  imports: [RouterLink, FontAwesomeModule],
+  imports: [RouterLink, FontAwesomeModule, NgClass],
   template: `
     <div id="testrunner-list" class="flex flex-col h-full px-4 sm:px-6 lg:px-8">
       <!-- Header -->
@@ -76,8 +77,13 @@ import { Dialog } from '@angular/cdk/dialog';
                 {{ testrunner.name }}
               </td>
               <td class="whitespace-nowrap px-3 py-4 text-sm">
-                <span class="inline-flex items-center gap-2 text-green-600">
-                  <fa-icon [icon]="icons.faFaceSleeping" class="text-xs" />
+                <span class="inline-flex items-center gap-2"
+                [ngClass]="{
+                  ' text-yellow-600 ': testrunner.status === 'sleeping',
+                  ' text-green-600 ': testrunner.status !== 'sleeping'
+                }"
+                >
+                  <fa-icon [icon]="getStatusIcon(testrunner.status)" class="text-xs" />
                   {{ testrunner.status }}
                 </span>
               </td>
@@ -88,7 +94,7 @@ import { Dialog } from '@angular/cdk/dialog';
                 {{ testrunner.lastPing }}
               </td>
               <td class="whitespace-nowrap px-3 py-4 text-sm flex gap-2">
-                <button class="text-red-600 hover:text-red-800"
+                <button class="text-orange-600 hover:text-orange-800"
                 (click)="onHeartbeatClicked($event)"
                 >
                   <fa-icon [icon]="icons.heartBeat" size="lg"></fa-icon>
@@ -111,10 +117,7 @@ export class ListComponent {
 
   async onHeartbeatClicked($event: Event) {
     $event.stopPropagation();
-    const result = await this.openConfirmDialog(
-      'Wirklich Heartbeat Anfordern?'
-    );
-    console.log('Dialog closed', result);
+
   }
 
       private async openConfirmDialog(confirmText: string): Promise<any> {
@@ -124,6 +127,19 @@ export class ListComponent {
         });
     
         return await firstValueFrom(dialogRef.closed);
+      }
+
+      getStatusIcon(status: string): IconDefinition {
+        switch (status) {
+          case 'running':
+            return this.icons.rabbitRunning;
+          case 'unreachable':
+            return this.icons.trash;
+          case 'sleeping':
+            return this.icons.faFaceSleeping;  
+          default:
+            return this.icons.trash;
+        }
       }
 
   icons = {

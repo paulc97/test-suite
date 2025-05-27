@@ -5,22 +5,22 @@ export class TestrunnerListSerivce {
   getTestrunners() {
     return [
       {
-        id: 1,
-        name: 'testrunner-1',
-        status: 'sleeping',
+        id: 123,
+        name: 'testrunner-123',
+        status: 'running',
         cpu: 'Vagrant',
         lastPing: 'vor 5 Sekunden',
       },
             {
-        id: 2,
-        name: 'testrunner-2',
+        id: 456,
+        name: 'testrunner-456',
         status: 'sleeping',
         cpu: 'k8s',
         lastPing: 'vor 10 Sekunden',
       },
             {
-        id: 3,
-        name: 'testrunner-3',
+        id: 768,
+        name: 'testrunner-768',
         status: 'sleeping',
         cpu: 'Docker',
         lastPing: 'vor 20 Sekunden',
