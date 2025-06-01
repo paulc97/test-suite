@@ -26,10 +26,10 @@ import { NgClass } from '@angular/common';
             </dt>
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight"
-                [ngClass]="{
-                  ' text-red-600 ': testDetailData().status === 'failed',
-                  ' text-green-600 ': testDetailData().status !== 'failed'
-                }" 
+              [ngClass]="{
+                ' text-red-600 ': testDetailData().status === 'failed',
+                ' text-green-600 ': testDetailData().status !== 'failed'
+              }"
             >
               {{ testDetailData().status }}
             </dd>
@@ -37,13 +37,11 @@ import { NgClass } from '@angular/common';
           <div
             class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6"
           >
-            <dt class="truncate text-sm font-medium text-gray-500">
-              Progress
-            </dt>
+            <dt class="truncate text-sm font-medium text-gray-500">Progress</dt>
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"
             >
-              {{ (testDetailData().progress)*100 + " %" }}
+              {{ testDetailData().progress * 100 + ' %' }}
             </dd>
           </div>
           <div
@@ -54,9 +52,7 @@ import { NgClass } from '@angular/common';
             </dt>
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"
-            >
-              {{ testDetailData().lastPing }}
-            </dd>
+            ></dd>
           </div>
         </dl>
       </div>
@@ -187,6 +183,5 @@ import { NgClass } from '@angular/common';
 export class DetailComponent {
   testDetailData = input.required<testDetails>();
 
-  formatSeconds = formatSeconds
-
+  formatSeconds = formatSeconds;
 }

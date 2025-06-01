@@ -1,42 +1,31 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+import { map, Observable } from 'rxjs';
 
 @Injectable()
 export class TestListSerivce {
-  getTests() {
-    return [
-      {
-        id: 1,
-        name: 'test-1',
-        status: 'running',
-        testrunner: 'testrunner-123',
-        lastPing: 'vor 5 Sekunden',
-        progress: 0.2,
-      },
-      {
-        id: 2,
-        name: 'test-2',
-        status: 'failed',
-        testrunner: 'testrunner-456',
-        lastPing: 'vor 15 Sekunden',
-        progress: 0.3,
-      },
-            {
-        id: 3,
-        name: 'test-3',
-        status: 'failed',
-        testrunner: 'testrunner-768',
-        lastPing: 'vor 42 Sekunden',
-        progress: 0.2,
-      },
-            {
-        id: 4,
-        name: 'test-4',
-        status: 'completed',
-        testrunner: 'testrunner-123',
-        lastPing: 'vor 55 Sekunden',
-        progress: 1,
-      },
-    ];
+  constructor(private http: HttpClient) {}
+
+  getTests(): Observable<testListElement[]> {
+    return this.http.get<any[]>('/test').pipe(
+      map((tests) =>
+        tests.map((t) => ({
+          id: t.id,
+          name: t.name,
+          status: t.status,
+          testrunner: t.testRunner,
+          lastPing: this.formatUnix(t.lastHeartbeat),
+          progress: t.progress,
+        }))
+      )
+    );
+  }
+
+  private formatUnix(timestamp: string): string {
+    const seconds = Date.now() / 1000 - Number(timestamp);
+    if (seconds < 60) return `vor ${Math.round(seconds)} Sekunden`;
+    if (seconds < 3600) return `vor ${Math.round(seconds / 60)} Minuten`;
+    return `vor ${Math.round(seconds / 3600)} Stunden`;
   }
 }
 

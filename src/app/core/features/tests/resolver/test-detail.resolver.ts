@@ -6,9 +6,8 @@ import { inject, Injectable } from '@angular/core';
 export class TestDetailResolver implements Resolve<testDetails> {
   private testDetailService = inject(TestDetailSerivce);
 
-  resolve(route:ActivatedRouteSnapshot) {
-    const id = route.paramMap.get("id") || ""
-    return this.testDetailService.getTestDetails(Number(id));
+  resolve(route: ActivatedRouteSnapshot) {
+    const id = route.paramMap.get('id') || '';
+    return this.testDetailService.getTestDetails(id);
   }
-  
 }
