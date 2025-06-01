@@ -1,7 +1,8 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, inject, input, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { Location } from '@angular/common';
+import { availableTest } from '../../services/start.service';
 
 @Component({
   selector: 'app-start',
@@ -21,7 +22,7 @@ import { Location } from '@angular/common';
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
               <ng-select
                 formControlName="testDefinitionForm"
-                [items]="testDefinitions"
+                [items]="availableTests()"
                 bindLabel="name"
                 bindValue="id"
                 placeholder="Bitte auswählen"
@@ -39,7 +40,7 @@ import { Location } from '@angular/common';
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
               <ng-select
                 formControlName="testRunnersForm"
-                [items]="forms.controls.testDefinitionForm.value === 1? testrunners : testrunners2"
+                [items]=""
                 bindLabel="name"
                 bindValue="id"
                 placeholder="Bitte auswählen"
@@ -51,35 +52,31 @@ import { Location } from '@angular/common';
               ></ng-select>
             </dd>
           </div>
-
-
         </dl>
         <div class="flex w-full justify-end gap-2">
           <button
-          id="new-client-button"
-          class="cursor-pointer block rounded-md bg-mhd px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-mhd/80"
-          (click)="onBackButtonClicked()"
+            id="new-client-button"
+            class="cursor-pointer block rounded-md bg-mhd px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-mhd/80"
+            (click)="onBackButtonClicked()"
           >
-          Abbrechen
-        </button>
+            Abbrechen
+          </button>
           <button
-          id="new-client-button"
-          class="cursor-pointer block rounded-md bg-mhd px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-mhd/80"
-          
+            id="new-client-button"
+            class="cursor-pointer block rounded-md bg-mhd px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-mhd/80"
           >
-          Test starten
-        </button>
-      </div>
-
+            Test starten
+          </button>
+        </div>
       </div>
     </form>
   `,
   styles: ``,
 })
 export class StartComponent implements OnInit {
+  private readonly location = inject(Location);
 
-  private readonly location = inject(Location)
-
+  availableTests = input<availableTest[]>();
 
   forms = new FormGroup({
     testDefinitionForm: new FormControl(null),
@@ -87,43 +84,80 @@ export class StartComponent implements OnInit {
   });
 
   ngOnInit(): void {
-    this.forms.controls.testRunnersForm.disable()
+    this.forms.controls.testRunnersForm.disable();
 
     this.forms.controls.testDefinitionForm.valueChanges.subscribe((value) => {
       if (value) {
-        this.forms.controls.testRunnersForm.enable()
-        this.forms.controls.testRunnersForm.reset()
+        this.forms.controls.testRunnersForm.enable();
+        this.forms.controls.testRunnersForm.reset();
       } else {
-        this.forms.controls.testRunnersForm.disable()
-        this.forms.controls.testRunnersForm.reset()
+        this.forms.controls.testRunnersForm.disable();
+        this.forms.controls.testRunnersForm.reset();
       }
-    })
-
+    });
   }
 
   onBackButtonClicked() {
-    this.location.back()
+    this.location.back();
   }
-
-  logForms() {
-    console.log(this.forms.controls.testDefinitionForm.value === 1?this.testrunners : this.testrunners2);
-  }
-
-  testDefinitions = [
-    { id: 1, name: 'Test 1' },
-    { id: 2, name: 'Test 2' },
-    { id: 3, name: 'Test 3' },
-  ];
-
-
-  testrunners = [
-    { id: 1, name: 'Testrunner A' },
-    { id: 2, name: 'Testrunner B' },
-    { id: 3, name: 'Testrunner C' },
-  ];
-
-  testrunners2 = [
-    { id: 4, name: 'Testrunner D' },
-    { id: 5, name: 'Testrunner E' },
-  ];
 }
+
+/* import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Injectable({
+  providedIn: 'root',
+})
+export class TestApiService {
+  private baseUrl = 'http://localhost:3000';
+
+  constructor(private http: HttpClient) {}
+
+  getRoot() {
+    this.http.get(`${this.baseUrl}/`).subscribe(console.log);
+  }
+
+  getTestRunner() {
+    this.http.get(`${this.baseUrl}/test-runner`).subscribe(console.log);
+  }
+
+  postStart() {
+    this.http.post(`${this.baseUrl}/test/start`, {}).subscribe(console.log);
+  }
+
+  getAvailableTests() {
+    this.http.get(`${this.baseUrl}/test/available-tests`).subscribe(console.log);
+  }
+
+  deleteTest() {
+    this.http.delete(`${this.baseUrl}/test/delete/`).subscribe(console.log);
+  }
+
+  getTestById() {
+    const id = 'd1d1d1d1-d1d1-4d1d-d1d1-d1d1d1d1d1d1';
+    this.http.get(`${this.baseUrl}/test/${id}`).subscribe(console.log);
+  }
+
+  getStatus() {
+    const id = 'd1d1d1d1-d1d1-4d1d-d1d1-d1d1d1d1d1d1';
+    this.http.get(`${this.baseUrl}/test/${id}/status`).subscribe(console.log);
+  }
+
+  getRunners() {
+    const id = 'e2e2e2e2-e2e2-4e2e-e2e2-e2e2e2e2e2e2';
+    this.http.get(`${this.baseUrl}/test/${id}/runners`).subscribe(console.log);
+  }
+
+  postReload() {
+    this.http.post(`${this.baseUrl}/test/reload`, {}).subscribe(console.log);
+  }
+
+  getLastReload() {
+    this.http.get(`${this.baseUrl}/test/last-reload`).subscribe(console.log);
+  }
+
+  postRestart() {
+    const id = 'd1d1d1d1-d1d1-4d1d-d1d1-d1d1d1d1d1d1';
+    this.http.post(`${this.baseUrl}/test/${id}/restart`, {}).subscribe(console.log);
+  }
+} */

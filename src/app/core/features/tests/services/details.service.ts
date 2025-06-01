@@ -1,10 +1,11 @@
 import { HttpClient } from '@angular/common/http';
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { map, Observable } from 'rxjs';
 
 @Injectable()
 export class TestDetailSerivce {
-  constructor(private http: HttpClient) {}
+  private readonly http = inject(HttpClient);
+
   getTestDetails(id: string): Observable<testDetails> {
     return this.http.get<any>(`/test/${id}`).pipe(
       map((data) => ({

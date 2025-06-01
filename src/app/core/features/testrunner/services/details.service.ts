@@ -1,53 +1,41 @@
-import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { inject, Injectable } from '@angular/core';
+import { TestrunnerListResponse } from './list.service';
+import { map } from 'rxjs';
 
 @Injectable()
 export class TestrunnerDetailSerivce {
-  getTestrunnerDetails(id: number) {
-    if (id === 123) {
-          return {
-      id: id,
-      name: 'testrunner-'+id,
-      status: 'running',
-      lastPing: 'vor 5 Sekunden',
-      startTime: new Date(Date.now() - 300 * 1000),
-      uptimeSeconds: 300,
-      activeTest: "test-1",
-      plattform: "Vagrant"
-    };
-    } else if (id == 456) {
-          return {
-      id: id,
-      name: 'testrunner-'+id,
-      status: 'sleeping',
-      lastPing: 'vor 10 Sekunden',
-      startTime: new Date(Date.now() - 350 * 1000),
-      uptimeSeconds: 350,
-      activeTest: "--",
-      plattform: "k8s"
-    };
-    } else {
-          return {
-      id: id,
-      name: 'testrunner-'+id,
-      status: 'sleeping',
-      lastPing: 'vor 20 Sekunden',
-      startTime: new Date(Date.now() - 680 * 1000),
-      uptimeSeconds: 680,
-      activeTest: "--",
-      plattform: "Docker"
-    };
-    }
+  private readonly http = inject(HttpClient);
+
+  getTestrunnerDetails(id: string) {
+    return this.http.get<testrunnerDetails>(`/test-runner/${id}`).pipe(
+      map((testsRunner) => ({
+        id: testsRunner.id,
+        name: testsRunner.name,
+        status: testsRunner.status,
+        platform: testsRunner.platform,
+        last_heartbeat: this.formatUnix(testsRunner.last_heartbeat),
+      }))
+    );
+  }
+
+  private formatUnix(timestamp: string): string {
+    const seconds = Date.now() / 1000 - Number(timestamp);
+    if (seconds < 60) return `vor ${Math.round(seconds)} Sekunden`;
+    if (seconds < 3600) return `vor ${Math.round(seconds / 60)} Minuten`;
+    return `vor ${Math.round(seconds / 3600)} Stunden`;
   }
 }
 
 export interface testrunnerDetails {
-  id: number;
+  id: string;
   name: string;
   status: string;
-  lastPing: string;
-  uptimeSeconds: number;
-  activeTest: string;
-  startTime: Date;
-  plattform: String;
+  platform: string[];
+  last_heartbeat: string;
+  last_feedback?: string;
+  last_update?: string;
+  active_test?: string;
+  elapsed_seconds?: string;
+  start_time?: string;
 }
-

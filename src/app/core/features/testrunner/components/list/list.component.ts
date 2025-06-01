@@ -1,6 +1,9 @@
 import { Component, inject, input } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { FontAwesomeModule,IconDefinition} from '@fortawesome/angular-fontawesome';
+import {
+  FontAwesomeModule,
+  IconDefinition,
+} from '@fortawesome/angular-fontawesome';
 import {
   faArrowLeft,
   faArrowRight,
@@ -32,9 +35,7 @@ import { NgClass } from '@angular/common';
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
           <h1 class="text-base font-semibold text-gray-900">Testrunner (3)</h1>
-          <p class="mt-2 text-sm text-gray-700">
-            Übersicht aller Testrunner.
-          </p>
+          <p class="mt-2 text-sm text-gray-700">Übersicht aller Testrunner.</p>
         </div>
       </div>
 
@@ -77,25 +78,30 @@ import { NgClass } from '@angular/common';
                 {{ testrunner.name }}
               </td>
               <td class="whitespace-nowrap px-3 py-4 text-sm">
-                <span class="inline-flex items-center gap-2"
-                [ngClass]="{
-                  ' text-yellow-600 ': testrunner.status === 'sleeping',
-                  ' text-green-600 ': testrunner.status !== 'sleeping'
-                }"
+                <span
+                  class="inline-flex items-center gap-2"
+                  [ngClass]="{
+                    ' text-yellow-600 ': testrunner.status === 'sleeping',
+                    ' text-green-600 ': testrunner.status !== 'sleeping'
+                  }"
                 >
-                  <fa-icon [icon]="getStatusIcon(testrunner.status)" class="text-xs" />
+                  <fa-icon
+                    [icon]="getStatusIcon(testrunner.status)"
+                    class="text-xs"
+                  />
                   {{ testrunner.status }}
                 </span>
               </td>
               <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-700">
-                {{ testrunner.cpu }}
+                {{ testrunner.platform.join(', ') }}
               </td>
               <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                {{ testrunner.lastPing }}
+                {{ testrunner.lastHeartbeat }}
               </td>
               <td class="whitespace-nowrap px-3 py-4 text-sm flex gap-2">
-                <button class="text-orange-600 hover:text-orange-800"
-                (click)="onHeartbeatClicked($event)"
+                <button
+                  class="text-orange-600 hover:text-orange-800"
+                  (click)="onHeartbeatClicked($event)"
                 >
                   <fa-icon [icon]="icons.heartBeat" size="lg"></fa-icon>
                 </button>
@@ -110,37 +116,35 @@ import { NgClass } from '@angular/common';
   styles: ``,
 })
 export class ListComponent {
+  testrunners = input<testrunnerListElement[]>();
 
-   testrunners = input<testrunnerListElement[]>();
-
-   private dialog = inject(Dialog);
+  private dialog = inject(Dialog);
 
   async onHeartbeatClicked($event: Event) {
     $event.stopPropagation();
-
   }
 
-      private async openConfirmDialog(confirmText: string): Promise<any> {
-        const dialogRef = this.dialog.open(ConfirmComponent, {
-          data: { confirmText },
-          width: '400px',
-        });
-    
-        return await firstValueFrom(dialogRef.closed);
-      }
+  private async openConfirmDialog(confirmText: string): Promise<any> {
+    const dialogRef = this.dialog.open(ConfirmComponent, {
+      data: { confirmText },
+      width: '400px',
+    });
 
-      getStatusIcon(status: string): IconDefinition {
-        switch (status) {
-          case 'running':
-            return this.icons.rabbitRunning;
-          case 'unreachable':
-            return this.icons.trash;
-          case 'sleeping':
-            return this.icons.faFaceSleeping;  
-          default:
-            return this.icons.trash;
-        }
-      }
+    return await firstValueFrom(dialogRef.closed);
+  }
+
+  getStatusIcon(status: string): IconDefinition {
+    switch (status) {
+      case 'running':
+        return this.icons.rabbitRunning;
+      case 'unreachable':
+        return this.icons.trash;
+      case 'sleeping':
+        return this.icons.faFaceSleeping;
+      default:
+        return this.icons.trash;
+    }
+  }
 
   icons = {
     male: faMars,

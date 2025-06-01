@@ -41,7 +41,7 @@ import { NgClass } from '@angular/common';
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"
             >
-              {{ testDetailData().progress * 100 + ' %' }}
+              {{ testDetailData().progress + ' %' }}
             </dd>
           </div>
           <div

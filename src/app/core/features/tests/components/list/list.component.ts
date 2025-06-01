@@ -38,9 +38,7 @@ import { firstValueFrom } from 'rxjs';
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
         <h1 class="text-base font-semibold text-gray-900">Tests (4)</h1>
-        <p class="mt-2 text-sm text-gray-700">
-          Übersicht aller Tests.
-        </p>
+        <p class="mt-2 text-sm text-gray-700">Übersicht aller Tests.</p>
       </div>
       <div class="mt-4 sm:mt-0 sm:flex-none flex items-center gap-2">
         <button
@@ -115,7 +113,7 @@ import { firstValueFrom } from 'rxjs';
               {{ test.lastPing }}
             </td>
             <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-              {{ test.progress * 100 }}%
+              {{ test.progress }}%
             </td>
             <td class="whitespace-nowrap px-3 py-4 text-sm flex gap-2">
               <button
@@ -152,7 +150,6 @@ export class ListComponent {
 
   async onHeartbeatClicked($event: Event) {
     $event.stopPropagation();
-    
   }
 
   private async openConfirmDialog(confirmText: string): Promise<any> {
@@ -189,7 +186,7 @@ export class ListComponent {
       case 'unreachable':
         return this.icons.trash;
       case 'completed':
-        return this.icons.circlecCheck;  
+        return this.icons.circlecCheck;
       default:
         return this.icons.trash;
     }

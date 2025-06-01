@@ -9,10 +9,15 @@ import { NgClass } from '@angular/common';
   template: `
     <div class="mx-auto max-w-7xl py-4 sm:px-6 lg:px-8">
       <div class="px-4 sm:px-0">
-        <h3 class="text-base/7 font-semibold text-gray-900">Testrunner-{{ testrunnerDetailData().id}}</h3>
+        <h3 class="text-base/7 font-semibold text-gray-900">
+          Testrunner-{{ testrunnerDetailData().id }}
+        </h3>
         <p class="mt-1 max-w-2xl text-sm/6 text-gray-500">
-          Informationen zu {{ testrunnerDetailData().name.charAt(0).toUpperCase() + testrunnerDetailData().name.slice(1) }}
-
+          Informationen zu
+          {{
+            testrunnerDetailData().name.charAt(0).toUpperCase() +
+              testrunnerDetailData().name.slice(1)
+          }}
         </p>
       </div>
       <div>
@@ -26,9 +31,10 @@ import { NgClass } from '@angular/common';
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight"
               [ngClass]="{
-                  ' text-yellow-600 ': testrunnerDetailData().status === 'sleeping',
-                  ' text-green-600 ': testrunnerDetailData().status !== 'sleeping'
-                }" 
+                ' text-yellow-600 ':
+                  testrunnerDetailData().status === 'sleeping',
+                ' text-green-600 ': testrunnerDetailData().status !== 'sleeping'
+              }"
             >
               {{ testrunnerDetailData().status }}
             </dd>
@@ -43,7 +49,7 @@ import { NgClass } from '@angular/common';
             <dd
               class="mt-1 text-3xl font-semibold tracking-tight text-gray-900"
             >
-              {{ testrunnerDetailData().lastPing }}
+              {{ testrunnerDetailData().last_heartbeat }}
             </dd>
           </div>
         </dl>
@@ -59,7 +65,7 @@ import { NgClass } from '@angular/common';
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Test</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ testrunnerDetailData().activeTest }}
+              {{ testrunnerDetailData().active_test }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -67,21 +73,19 @@ import { NgClass } from '@angular/common';
               Registrierungszeit
             </dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ testrunnerDetailData().startTime }}
+              {{ testrunnerDetailData().start_time }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
-            <dt class="text-sm/6 font-medium text-gray-900">
-              Laufzeit
-            </dt>
+            <dt class="text-sm/6 font-medium text-gray-900">Laufzeit</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ formatSeconds(testrunnerDetailData().uptimeSeconds) }}
+              {{ testrunnerDetailData().elapsed_seconds }}
             </dd>
           </div>
           <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
             <dt class="text-sm/6 font-medium text-gray-900">Plattform</dt>
             <dd class="mt-1 text-sm/6 text-gray-700 sm:col-span-2 sm:mt-0">
-              {{ testrunnerDetailData().plattform }}
+              {{ testrunnerDetailData().platform.join(', ') }}
             </dd>
           </div>
           <!-- <div class="px-4 py-6 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-0">
@@ -159,5 +163,5 @@ import { NgClass } from '@angular/common';
 export class DetailComponent {
   testrunnerDetailData = input.required<testrunnerDetails>();
 
-  formatSeconds = formatSeconds
+  formatSeconds = formatSeconds;
 }
