@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 @Injectable()
 export class TestrunnerListSerivce {
@@ -18,6 +18,10 @@ export class TestrunnerListSerivce {
         }))
       )
     );
+  }
+
+  triggerHeartbeat(id: string): Observable<void> {
+    return this.http.post<void>(`/test-runner/${id}/heartbeat`, {});
   }
 
   private formatUnix(timestamp: string): string {

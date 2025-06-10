@@ -1,5 +1,12 @@
-import { Component, inject, input } from '@angular/core';
-import { RouterLink } from '@angular/router';
+import {
+  Component,
+  inject,
+  input,
+  signal,
+  OnInit,
+  WritableSignal,
+} from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -7,7 +14,6 @@ import {
 import {
   faArrowLeft,
   faArrowRight,
-  faFileZipper,
   faFilter,
   faMars,
   faVenus,
@@ -19,8 +25,12 @@ import {
   faTrash,
   faRabbitRunning,
   faFaceSleeping,
+  faFileZipper,
 } from '@fortawesome/pro-solid-svg-icons';
-import { testrunnerListElement } from '../../services/list.service';
+import {
+  testrunnerListElement,
+  TestrunnerListSerivce,
+} from '../../services/list.service';
 import { firstValueFrom } from 'rxjs';
 import { ConfirmComponent } from '../../../shared/components/confirm/confirm.component';
 import { Dialog } from '@angular/cdk/dialog';
@@ -28,13 +38,16 @@ import { NgClass } from '@angular/common';
 
 @Component({
   selector: 'app-list',
+  standalone: true,
   imports: [RouterLink, FontAwesomeModule, NgClass],
   template: `
     <div id="testrunner-list" class="flex flex-col h-full px-4 sm:px-6 lg:px-8">
       <!-- Header -->
       <div class="sm:flex sm:items-center">
         <div class="sm:flex-auto">
-          <h1 class="text-base font-semibold text-gray-900">Testrunner (3)</h1>
+          <h1 class="text-base font-semibold text-gray-900">
+            Testrunner ({{ testrunners().length }})
+          </h1>
           <p class="mt-2 text-sm text-gray-700">Übersicht aller Testrunner.</p>
         </div>
       </div>
@@ -71,18 +84,20 @@ import { NgClass } from '@angular/common';
               </th>
             </tr>
           </thead>
+
           <tbody class="divide-y divide-gray-200">
-            @for(testrunner of testrunners();track testrunner){
+            @for (testrunner of testrunners(); track testrunner) {
             <tr class="hover:bg-gray-100" [routerLink]="[testrunner.id]">
               <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-900">
                 {{ testrunner.name }}
               </td>
+
               <td class="whitespace-nowrap px-3 py-4 text-sm">
                 <span
                   class="inline-flex items-center gap-2"
                   [ngClass]="{
-                    ' text-yellow-600 ': testrunner.status === 'sleeping',
-                    ' text-green-600 ': testrunner.status !== 'sleeping'
+                    'text-yellow-600': testrunner.status === 'sleeping',
+                    'text-green-600': testrunner.status !== 'sleeping'
                   }"
                 >
                   <fa-icon
@@ -92,16 +107,19 @@ import { NgClass } from '@angular/common';
                   {{ testrunner.status }}
                 </span>
               </td>
+
               <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-700">
                 {{ testrunner.platform.join(', ') }}
               </td>
+
               <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
                 {{ testrunner.lastHeartbeat }}
               </td>
+
               <td class="whitespace-nowrap px-3 py-4 text-sm flex gap-2">
                 <button
                   class="text-orange-600 hover:text-orange-800"
-                  (click)="onHeartbeatClicked($event)"
+                  (click)="onHeartbeatClicked($event, testrunner.id)"
                 >
                   <fa-icon [icon]="icons.heartBeat" size="lg"></fa-icon>
                 </button>
@@ -115,50 +133,101 @@ import { NgClass } from '@angular/common';
   `,
   styles: ``,
 })
-export class ListComponent {
-  testrunners = input<testrunnerListElement[]>();
+export class ListComponent implements OnInit {
+  /* ------------------------------------------------------------------ */
+  /*                   Eingangsdaten (read-only InputSignal)             */
+  /* ------------------------------------------------------------------ */
+  initialTestrunners = input<testrunnerListElement[]>();
+  private readonly route = inject(ActivatedRoute);
 
-  private dialog = inject(Dialog);
+  /* ------------------------------------------------------------------ */
+  /*           Beschreibbares Signal zum Aktualisieren der Tabelle       */
+  /* ------------------------------------------------------------------ */
+  testrunners: WritableSignal<testrunnerListElement[]> = signal<
+    testrunnerListElement[]
+  >([]);
 
-  async onHeartbeatClicked($event: Event) {
-    $event.stopPropagation();
+  /* ------------------------------------------------------------------ */
+  /*                         Services / DI                              */
+  /* ------------------------------------------------------------------ */
+  private readonly dialog = inject(Dialog);
+  private readonly testrunnerService = inject(TestrunnerListSerivce);
+
+  /* ------------------------------------------------------------------ */
+  /*                            Lifecycle                               */
+  /* ------------------------------------------------------------------ */
+  ngOnInit(): void {
+    const data = this.route.snapshot.data['testrunners'] as
+      | testrunnerListElement[]
+      | undefined;
+    this.testrunners.set(data ?? []);
   }
 
-  private async openConfirmDialog(confirmText: string): Promise<any> {
-    const dialogRef = this.dialog.open(ConfirmComponent, {
+  /* ------------------------------------------------------------------ */
+  /*                             Aktionen                               */
+  /* ------------------------------------------------------------------ */
+  async onHeartbeatClicked(event: Event, id: string): Promise<void> {
+    event.stopPropagation();
+
+    try {
+      await firstValueFrom(this.testrunnerService.triggerHeartbeat(id));
+      await this.reloadTestrunners();
+    } catch (err) {
+      console.error('Fehler beim Senden des Heartbeats:', err);
+    }
+  }
+
+  /** Ruft aktuelle Liste ab und schreibt sie ins writable Signal */
+  private async reloadTestrunners(): Promise<void> {
+    const data = await firstValueFrom(this.testrunnerService.getTestrunners());
+    this.testrunners.set(data);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /*                        Hilfsfunktionen                             */
+  /* ------------------------------------------------------------------ */
+  private async openConfirmDialog(confirmText: string): Promise<boolean> {
+    // Das <boolean> tippt den Rückgabetyp –> dialogRef.closed: Observable<boolean | undefined>
+    const dialogRef = this.dialog.open<boolean>(ConfirmComponent, {
       data: { confirmText },
       width: '400px',
     });
 
-    return await firstValueFrom(dialogRef.closed);
+    const result = await firstValueFrom(dialogRef.closed);
+    // undefined → false (z. B. Dialog mit ESC geschlossen)
+    return result === true;
   }
 
   getStatusIcon(status: string): IconDefinition {
     switch (status) {
       case 'running':
         return this.icons.rabbitRunning;
+      case 'sleeping':
+        return this.icons.faceSleeping;
       case 'unreachable':
         return this.icons.trash;
-      case 'sleeping':
-        return this.icons.faFaceSleeping;
       default:
         return this.icons.trash;
     }
   }
 
+  /* ------------------------------------------------------------------ */
+  /*                               Icons                                */
+  /* ------------------------------------------------------------------ */
   icons = {
-    male: faMars,
-    female: faVenus,
-    diverse: faVenusMars,
     filter: faFilter,
     arrowRight: faArrowRight,
     arrowLeft: faArrowLeft,
-    trash: faTrash,
     arrowUp: faArrowUp,
     arrowDown: faArrowDown,
     arrowsRotate: faArrowsRotate,
     heartBeat: faWavePulse,
     rabbitRunning: faRabbitRunning,
-    faFaceSleeping: faFaceSleeping,
+    faceSleeping: faFaceSleeping,
+    trash: faTrash,
+    male: faMars,
+    female: faVenus,
+    diverse: faVenusMars,
+    fileZipper: faFileZipper,
   };
 }

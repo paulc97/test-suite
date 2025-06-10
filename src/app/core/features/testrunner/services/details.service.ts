@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
 import { TestrunnerListResponse } from './list.service';
-import { map } from 'rxjs';
+import { map, tap } from 'rxjs';
 
 @Injectable()
 export class TestrunnerDetailSerivce {
@@ -9,12 +9,18 @@ export class TestrunnerDetailSerivce {
 
   getTestrunnerDetails(id: string) {
     return this.http.get<testrunnerDetails>(`/test-runner/${id}`).pipe(
-      map((testsRunner) => ({
-        id: testsRunner.id,
-        name: testsRunner.name,
-        status: testsRunner.status,
-        platform: testsRunner.platform,
-        last_heartbeat: this.formatUnix(testsRunner.last_heartbeat),
+      tap(console.log), // zeigt alle Felder in der Konsole
+      map((runner) => ({
+        id: runner.id,
+        name: runner.name,
+        status: runner.status,
+        platform: runner.platform,
+        last_heartbeat: this.formatUnix(runner.last_heartbeat),
+        last_feedback: runner.last_feedback,
+        last_update: runner.last_update,
+        active_test: runner.active_test,
+        elapsed_seconds: runner.elapsed_seconds,
+        start_time: runner.start_time,
       }))
     );
   }

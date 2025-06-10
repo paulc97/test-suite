@@ -1,4 +1,4 @@
-import { Component, inject, input } from '@angular/core';
+import { Component, inject, input, OnInit } from '@angular/core';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -25,6 +25,7 @@ import { testListElement } from '../../services/list.service';
 import { Dialog } from '@angular/cdk/dialog';
 import { ConfirmComponent } from '../../../shared/components/confirm/confirm.component';
 import { firstValueFrom } from 'rxjs';
+import { ToastService } from '../../../shared/services/toast.service';
 
 @Component({
   selector: 'app-list',
@@ -41,6 +42,13 @@ import { firstValueFrom } from 'rxjs';
         <p class="mt-2 text-sm text-gray-700">Übersicht aller Tests.</p>
       </div>
       <div class="mt-4 sm:mt-0 sm:flex-none flex items-center gap-2">
+        <button
+          id="new-client-button"
+          (click)="onLoadTestDefinitionsClicked()"
+          class="cursor-pointer block rounded-md bg-mhd px-3 py-2 text-center text-sm font-semibold text-white shadow-sm hover:bg-mhd/80"
+        >
+          Testpläne Laden
+        </button>
         <button
           id="new-client-button"
           [routerLink]="['start-test']"
@@ -144,12 +152,14 @@ import { firstValueFrom } from 'rxjs';
   styles: ``,
 })
 export class ListComponent {
+  constructor(private toast: ToastService) {}
   private dialog = inject(Dialog);
 
   tests = input<testListElement[]>();
 
   async onHeartbeatClicked($event: Event) {
     $event.stopPropagation();
+    this.toast.show('Heartbeat angefordert', 'success');
   }
 
   private async openConfirmDialog(confirmText: string): Promise<any> {
@@ -169,6 +179,11 @@ export class ListComponent {
     $event.stopPropagation();
     const result = await this.openConfirmDialog('Test wirklich abbrechen?');
     console.log('Dialog closed', result);
+  }
+
+  onLoadTestDefinitionsClicked() {
+    console.log('Load test definitions clicked');
+    this.toast.show('Noch mock', 'success');
   }
 
   getStatusIcon(status: string): IconDefinition {
