@@ -1,4 +1,11 @@
-import { Component, inject, input, OnInit } from '@angular/core';
+import {
+  Component,
+  inject,
+  input,
+  OnInit,
+  signal,
+  WritableSignal,
+} from '@angular/core';
 import {
   FontAwesomeModule,
   IconDefinition,
@@ -19,9 +26,9 @@ import {
   faXmark,
   faCircleCheck,
 } from '@fortawesome/pro-solid-svg-icons';
-import { RouterLink } from '@angular/router';
+import { ActivatedRoute, RouterLink } from '@angular/router';
 import { NgClass } from '@angular/common';
-import { testListElement } from '../../services/list.service';
+import { TestListElement, TestListService } from '../../services/list.service';
 import { Dialog } from '@angular/cdk/dialog';
 import { ConfirmComponent } from '../../../shared/components/confirm/confirm.component';
 import { firstValueFrom } from 'rxjs';
@@ -38,8 +45,13 @@ import { ToastService } from '../../../shared/services/toast.service';
 
     <div class="sm:flex sm:items-center">
       <div class="sm:flex-auto">
-        <h1 class="text-base font-semibold text-gray-900">Tests (4)</h1>
+        <h1 class="text-base font-semibold text-gray-900">
+          Tests ({{ tests().length }})
+        </h1>
         <p class="mt-2 text-sm text-gray-700">Übersicht aller Tests.</p>
+        <div class="mt-2 text-sm text-gray-500">
+          {{ formatReloadTime(lastReload()) || 'Nicht geladen' }}
+        </div>
       </div>
       <div class="mt-4 sm:mt-0 sm:flex-none flex items-center gap-2">
         <button
@@ -106,8 +118,9 @@ import { ToastService } from '../../../shared/services/toast.service';
               <span
                 class="inline-flex items-center gap-2"
                 [ngClass]="{
-                  ' text-red-600 ': test.status === 'failed',
-                  ' text-green-600 ': test.status !== 'failed'
+                  ' text-red-600 ': test.status === 'Failed',
+                  ' text-green-600 ': test.status === 'Running',
+                  ' text-blue-600': test.status === 'Completed'
                 }"
               >
                 <fa-icon [icon]="getStatusIcon(test.status)" class="text-xs" />
@@ -126,19 +139,19 @@ import { ToastService } from '../../../shared/services/toast.service';
             <td class="whitespace-nowrap px-3 py-4 text-sm flex gap-2">
               <button
                 class="text-orange-600 hover:text-orange-800"
-                (click)="onHeartbeatClicked($event)"
+                (click)="onHeartbeatClicked($event, test.id)"
               >
                 <fa-icon [icon]="icons.heartBeat" size="lg"></fa-icon>
               </button>
               <button
                 class="text-orange-600 hover:text-orange-800"
-                (click)="onRefreshClicked($event)"
+                (click)="onRefreshClicked($event, test.id)"
               >
                 <fa-icon [icon]="icons.arrowsRotate" size="lg"></fa-icon>
               </button>
               <button
                 class="text-orange-600 hover:text-orange-800"
-                (click)="onDeleteClicked($event)"
+                (click)="onDeleteClicked($event, test.id)"
               >
                 <fa-icon [icon]="icons.xMark" size="lg"></fa-icon>
               </button>
@@ -151,76 +164,189 @@ import { ToastService } from '../../../shared/services/toast.service';
   </div>`,
   styles: ``,
 })
-export class ListComponent {
-  constructor(private toast: ToastService) {}
-  private dialog = inject(Dialog);
+export class TestsListComponent implements OnInit {
+  /* ---------------- Signale ---------------- */
+  tests: WritableSignal<TestListElement[]> = signal<TestListElement[]>([]);
 
-  tests = input<testListElement[]>();
+  /* --------------- DI & Services ----------- */
+  private readonly route = inject(ActivatedRoute);
+  private readonly dialog = inject(Dialog);
+  private readonly toast = inject(ToastService);
+  private readonly svc = inject(TestListService);
 
-  async onHeartbeatClicked($event: Event) {
-    $event.stopPropagation();
-    this.toast.show('Heartbeat angefordert', 'success');
+  /* --------------- Lifecycle --------------- */
+  ngOnInit(): void {
+    const initial = this.route.snapshot.data['tests'] as
+      | TestListElement[]
+      | undefined;
+    this.tests.set(initial ?? []);
+
+    this.loadLastReload();
   }
 
-  private async openConfirmDialog(confirmText: string): Promise<any> {
-    const dialogRef = this.dialog.open(ConfirmComponent, {
-      data: { confirmText },
-      width: '400px',
+  lastReload = signal<string>('');
+
+  private loadLastReload(): void {
+    this.svc.getLastReload().subscribe({
+      next: (val) => this.lastReload.set(val),
+      error: (err) => {
+        console.error('Fehler beim Laden von last-reload', err);
+        this.lastReload.set('Fehler beim Laden');
+      },
     });
+  }
 
-    return await firstValueFrom(dialogRef.closed);
+  /* --------------- Aktionen ---------------- */
+  async onHeartbeatClicked(e: Event, id: string): Promise<void> {
+    e.stopPropagation();
+    this.toast.show('Heartbeat wird angefordert …', 'success');
+
+    try {
+      const update = await firstValueFrom(this.svc.fetchStatus(id));
+      this.tests.update((arr) =>
+        arr.map((t) =>
+          t.id === id
+            ? {
+                ...t,
+                status: update.status ?? t.status,
+                progress: update.progress ?? t.progress,
+                // Optional: weitere Felder wie last_message anzeigen/speichern
+              }
+            : t
+        )
+      );
+    } catch (err) {
+      console.error('Heartbeat-Abruf fehlgeschlagen', err);
+      this.toast.show('Heartbeat fehlgeschlagen', 'error');
+    }
   }
-  async onRefreshClicked($event: Event) {
-    $event.stopPropagation();
-    const result = await this.openConfirmDialog('Test wirklich neustarten?');
-    console.log('Dialog closed', result);
+
+  async onRefreshClicked(e: Event, id: string): Promise<void> {
+    e.stopPropagation();
+
+    const ok = await this.openConfirmDialog('Test wirklich neustarten?');
+    console.log(ok);
+    if (!ok) return;
+
+    try {
+      this.toast.show('Test wird neu gestartet …', 'success');
+      await firstValueFrom(this.svc.restartTest(id));
+      this.toast.show(
+        'Restart erfolgreich. Status wird aktualisiert …',
+        'success'
+      );
+
+      // Danach Heartbeat laden:
+      const update = await firstValueFrom(this.svc.fetchStatus(id));
+      this.tests.update((arr) =>
+        arr.map((t) =>
+          t.id === id
+            ? {
+                ...t,
+                status: update.status ?? t.status,
+                progress: update.progress ?? t.progress,
+              }
+            : t
+        )
+      );
+    } catch (err) {
+      console.error('Restart fehlgeschlagen', err);
+      this.toast.show('Restart oder Statusabruf fehlgeschlagen', 'error');
+    }
   }
-  async onDeleteClicked($event: Event) {
-    $event.stopPropagation();
-    const result = await this.openConfirmDialog('Test wirklich abbrechen?');
-    console.log('Dialog closed', result);
+
+  async onDeleteClicked(e: Event, id: string): Promise<void> {
+    e.stopPropagation();
+
+    const ok = await this.openConfirmDialog('Test wirklich abbrechen/löschen?');
+    if (!ok) return;
+
+    try {
+      await firstValueFrom(this.svc.deleteTest(id));
+      this.toast.show('Test wurde gelöscht', 'success');
+
+      // Test aus Liste entfernen
+      this.tests.update((arr) => arr.filter((t) => t.id !== id));
+    } catch (err) {
+      console.error('Löschen fehlgeschlagen', err);
+      this.toast.show('Löschen fehlgeschlagen', 'error');
+    }
   }
 
   onLoadTestDefinitionsClicked() {
-    console.log('Load test definitions clicked');
-    this.toast.show('Noch mock', 'success');
+    this.toast.show('Lade Testpläne …', 'info');
+
+    this.svc.reloadTestPlans().subscribe({
+      next: (res) => {
+        res.updated.forEach((entry) => {
+          this.toast.show(`✅ Erfolgreich aktualisiert: ${entry}`, 'success');
+        });
+        res.failed.forEach((entry) => {
+          this.toast.show(`❌ Fehler bei: ${entry}`, 'error');
+        });
+
+        // Aktualisiere lastReload mit timestamp aus der Antwort
+        this.lastReload.set(res.timestamp);
+      },
+      error: (err) => {
+        console.error('Fehler beim Testplan-Reload', err);
+        this.toast.show('Fehler beim Testplan-Reload', 'error');
+      },
+    });
+  }
+
+  /* -------------- Helper ------------------- */
+  private async openConfirmDialog(text: string): Promise<boolean> {
+    const ref = this.dialog.open<boolean>(ConfirmComponent, {
+      data: { confirmText: text },
+      width: '400px',
+    });
+    const result = await firstValueFrom(ref.closed);
+    return result || false;
   }
 
   getStatusIcon(status: string): IconDefinition {
+    console.log('status', status);
     switch (status) {
-      case 'running':
+      case 'Running':
         return this.icons.rabbitRunning;
-      case 'passed':
-        return this.icons.trash;
-      case 'failed':
+      case 'Failed':
         return this.icons.xMark;
-      case 'skipped':
-        return this.icons.trash;
-      case 'pending':
-        return this.icons.trash;
-      case 'unreachable':
-        return this.icons.trash;
-      case 'completed':
-        return this.icons.circlecCheck;
+      case 'Completed':
+        return this.icons.circleCheck;
       default:
         return this.icons.trash;
     }
   }
 
+  formatReloadTime(timestamp: string | null | undefined): string {
+    if (!timestamp) return 'unbekannt';
+    const date = new Date(timestamp);
+    return `Letztes Laden der Testpläne: ${date.toLocaleString('de-DE', {
+      weekday: 'short', // z. B. "Di."
+      year: 'numeric',
+      month: 'long', // z. B. "Juni"
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+    })}`;
+  }
+
+  /* -------------- Icons -------------------- */
   icons = {
-    male: faMars,
-    female: faVenus,
-    diverse: faVenusMars,
     filter: faFilter,
     arrowRight: faArrowRight,
     arrowLeft: faArrowLeft,
-    trash: faTrash,
     arrowUp: faArrowUp,
     arrowDown: faArrowDown,
     arrowsRotate: faArrowsRotate,
     heartBeat: faWavePulse,
     rabbitRunning: faRabbitRunning,
     xMark: faXmark,
-    circlecCheck: faCircleCheck,
+    circleCheck: faCircleCheck,
+    trash: faTrash,
+    male: faMars,
+    female: faVenus,
+    diverse: faVenusMars,
   };
 }

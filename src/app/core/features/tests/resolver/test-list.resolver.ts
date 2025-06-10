@@ -1,12 +1,11 @@
 import { Resolve } from '@angular/router';
-import { testListElement, TestListSerivce } from '../services/list.service';
+import { TestListElement, TestListService } from '../services/list.service';
 import { inject, Injectable } from '@angular/core';
 
 @Injectable()
-export class TestListResolver implements Resolve<testListElement[]> {
-  private testListService = inject(TestListSerivce);
-
+export class TestsListResolver implements Resolve<TestListElement[]> {
+  private readonly svc = inject(TestListService);
   resolve() {
-    return this.testListService.getTests();
+    return this.svc.getTests();
   }
 }

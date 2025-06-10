@@ -1,10 +1,10 @@
 import { Routes } from '@angular/router';
-import { ListComponent } from './core/features/tests/components/list/list.component';
+import { TestsListComponent } from './core/features/tests/components/list/list.component';
 import { DetailComponent } from './core/features/tests/components/detail/detail.component';
 import { ListComponent as TestrunnerListComponent } from './core/features/testrunner/components/list/list.component';
 import { DetailComponent as TestrunnerDetailComponent } from './core/features/testrunner/components/detail/detail.component';
-import { TestListSerivce } from './core/features/tests/services/list.service';
-import { TestListResolver } from './core/features/tests/resolver/test-list.resolver';
+import { TestListService } from './core/features/tests/services/list.service';
+import { TestsListResolver } from './core/features/tests/resolver/test-list.resolver';
 import { TestDetailSerivce } from './core/features/tests/services/details.service';
 import { TestDetailResolver } from './core/features/tests/resolver/test-detail.resolver';
 import { StartComponent } from './core/features/tests/components/start/start.component';
@@ -23,10 +23,10 @@ export const routes: Routes = [
   },
   {
     path: 'tests',
-    component: ListComponent,
+    component: TestsListComponent,
     title: 'Sourcepark | Tests',
-    providers: [TestListSerivce, TestListResolver],
-    resolve: { tests: TestListResolver },
+    providers: [TestListService, TestsListResolver],
+    resolve: { tests: TestsListResolver },
   },
   {
     path: 'tests/start-test',

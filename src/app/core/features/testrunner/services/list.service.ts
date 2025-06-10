@@ -25,10 +25,14 @@ export class TestrunnerListSerivce {
   }
 
   private formatUnix(timestamp: string): string {
-    const seconds = Date.now() / 1000 - Number(timestamp);
-    if (seconds < 60) return `vor ${Math.round(seconds)} Sekunden`;
-    if (seconds < 3600) return `vor ${Math.round(seconds / 60)} Minuten`;
-    return `vor ${Math.round(seconds / 3600)} Stunden`;
+    const now = Date.now(); // ms
+    const ts = Number(timestamp); // ms
+    const diffSeconds = (now - ts) / 1000;
+
+    if (diffSeconds < 60) return `vor ${Math.round(diffSeconds)} Sekunden`;
+    if (diffSeconds < 3600)
+      return `vor ${Math.round(diffSeconds / 60)} Minuten`;
+    return `vor ${Math.round(diffSeconds / 3600)} Stunden`;
   }
 }
 

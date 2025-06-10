@@ -135,13 +135,13 @@ import { NgClass } from '@angular/common';
 })
 export class ListComponent implements OnInit {
   /* ------------------------------------------------------------------ */
-  /*                   Eingangsdaten (read-only InputSignal)             */
+  /*                   Eingangsdaten (read-only InputSignal)            */
   /* ------------------------------------------------------------------ */
   initialTestrunners = input<testrunnerListElement[]>();
   private readonly route = inject(ActivatedRoute);
 
   /* ------------------------------------------------------------------ */
-  /*           Beschreibbares Signal zum Aktualisieren der Tabelle       */
+  /*           Beschreibbares Signal zum Aktualisieren der Tabelle      */
   /* ------------------------------------------------------------------ */
   testrunners: WritableSignal<testrunnerListElement[]> = signal<
     testrunnerListElement[]
@@ -183,29 +183,17 @@ export class ListComponent implements OnInit {
     this.testrunners.set(data);
   }
 
-  /* ------------------------------------------------------------------ */
-  /*                        Hilfsfunktionen                             */
-  /* ------------------------------------------------------------------ */
-  private async openConfirmDialog(confirmText: string): Promise<boolean> {
-    // Das <boolean> tippt den Rückgabetyp –> dialogRef.closed: Observable<boolean | undefined>
-    const dialogRef = this.dialog.open<boolean>(ConfirmComponent, {
-      data: { confirmText },
-      width: '400px',
-    });
-
-    const result = await firstValueFrom(dialogRef.closed);
-    // undefined → false (z. B. Dialog mit ESC geschlossen)
-    return result === true;
-  }
-
   getStatusIcon(status: string): IconDefinition {
+    console.log(status);
     switch (status) {
-      case 'running':
+      case 'RUNNING':
         return this.icons.rabbitRunning;
-      case 'sleeping':
+      case 'SLEEPING':
         return this.icons.faceSleeping;
-      case 'unreachable':
+      case 'UNREACHABLE':
         return this.icons.trash;
+      case 'IDLE':
+        return this.icons.sleeping;
       default:
         return this.icons.trash;
     }
@@ -229,5 +217,6 @@ export class ListComponent implements OnInit {
     female: faVenus,
     diverse: faVenusMars,
     fileZipper: faFileZipper,
+    sleeping: faFaceSleeping,
   };
 }

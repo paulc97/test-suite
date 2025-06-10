@@ -1,5 +1,5 @@
 import { Resolve } from '@angular/router';
-import { testListElement, TestListSerivce } from '../services/list.service';
+import { TestListElement, TestListService } from '../services/list.service';
 import { inject, Injectable } from '@angular/core';
 import { availableTest, TestStartSerivce } from '../services/start.service';
 

@@ -25,6 +25,7 @@ export class TestDetailSerivce {
           description: data.description,
           lastReload: new Date(data.last_reload),
           testrunId: data.testrun_id,
+          last_message: data.last_message,
         };
       })
     );
@@ -45,4 +46,5 @@ export interface testDetails {
   description: string;
   lastReload: Date;
   testrunId: string;
+  last_message: string;
 }
